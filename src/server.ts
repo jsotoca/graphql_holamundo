@@ -1,20 +1,24 @@
 import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
-import { graphqlHTTP } from 'express-graphql';
 import schema from './schema/index';
+import { ApolloServer } from 'apollo-server-express';
+import { createServer } from 'http';
 
 const app = express();
 app.use('*',cors());
 app.use(compression());
 
-app.use('/',graphqlHTTP({
+const server = new ApolloServer({
     schema,
-    graphiql:true
-}));
+    introspection:true
+});
+
+server.applyMiddleware({ app });
+const httpServer = createServer(app);
 
 const PORT = 5300;
-app.listen(
+httpServer.listen(
     {port:PORT},
-    () => console.log(`Servidor Express corriendo http://localhost:${PORT}`)
+    () => console.log(`Servidor GraphlQL corriendo http://localhost:${PORT}/graphql 🚀`)
 );
